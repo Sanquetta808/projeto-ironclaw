@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGO — Sistema de Gestão Operacional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1E2019;
+    --bunker:#232821;
+    --bunker-panel:#2E3428;
+    --bunker-border:#3C4433;
+    --parchment:#ECE6D6;
+    --panel:#F6F2E7;
+    --brass:#B8863A;
+    --brass-deep:#8A6423;
+    --moss:#556B4A;
+    --oxide:#8C3B2E;
+    --border-light:#D8D0B4;
+    --muted:#5C5A4D;
+    --text-light:#EDEAE0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'IBM Plex Sans', sans-serif;
+    background:var(--parchment);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.brand-name,.stat-number{
+    font-family:'Oswald', sans-serif;
+  }
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;animation:none !important;}
+  }
+
+  .app{display:flex;min-height:100vh;}
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width:262px;flex-shrink:0;
+    background:var(--bunker);
+    color:var(--text-light);
+    display:flex;flex-direction:column;
+    border-right:3px solid var(--brass);
+  }
+  .sidebar-header{
+    padding:26px 22px 20px;
+    border-bottom:1px solid var(--bunker-border);
+    display:flex;align-items:center;gap:12px;
+  }
+  .crest{width:40px;height:40px;flex-shrink:0;}
+  .brand-name{font-size:19px;font-weight:600;letter-spacing:.3px;line-height:1.15;}
+  .brand-sub{font-size:11.5px;color:#B7B39E;margin-top:3px;line-height:1.3;}
+
+  .nav{flex:1;padding:18px 12px;}
+  .nav ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;}
+  .nav a{
+    display:flex;align-items:center;gap:12px;
+    padding:11px 14px;
+    color:#C8C4B0;
+    border-left:3px solid transparent;
+    font-size:14.5px;font-weight:500;
+    cursor:pointer;
+  }
+  .nav a svg{width:18px;height:18px;flex-shrink:0;}
+  .nav a:hover{background:var(--bunker-panel);color:var(--text-light);}
+  .nav a.active{
+    background:var(--bunker-panel);
+    color:var(--text-light);
+    border-left-color:var(--brass);
+  }
+
+  .sidebar-footer{
+    padding:16px 22px 22px;
+    border-top:1px solid var(--bunker-border);
+    font-size:12px;color:#9B977F;line-height:1.5;
+  }
+
+  /* ---------- MAIN ---------- */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;}
+  .topbar{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    padding:30px 42px 20px;
+    border-bottom:1px solid var(--border-light);
+    gap:20px;flex-wrap:wrap;
+  }
+  .topbar h1{margin:0;font-size:27px;font-weight:600;letter-spacing:.2px;}
+  .topbar .subtitle{margin:6px 0 0;font-size:14px;color:var(--muted);}
+  .topbar .today{font-size:13px;color:var(--muted);white-space:nowrap;}
+
+  .content{padding:30px 42px 60px;overflow-y:auto;}
+
+  /* ---------- DASHBOARD ---------- */
+  .stats-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:16px;margin-bottom:34px;
+  }
+  .stat-card{
+    background:var(--panel);border:1px solid var(--border-light);
+    border-top:3px solid var(--brass);padding:20px 20px 18px;
+  }
+  .stat-number{font-size:34px;font-weight:600;color:var(--ink);}
+  .stat-label{font-size:13px;color:var(--muted);margin-top:5px;}
+
+  .panel-block{background:var(--panel);border:1px solid var(--border-light);margin-bottom:24px;}
+  .panel-block h2{font-size:16px;font-weight:600;margin:0;padding:16px 20px;border-bottom:1px solid var(--border-light);}
+  .alert-row{
+    display:flex;align-items:center;gap:14px;
+    padding:12px 20px;border-bottom:1px solid var(--border-light);
+    font-size:14px;
+  }
+  .alert-row:last-child{border-bottom:none;}
+  .alert-bar{width:4px;align-self:stretch;flex-shrink:0;}
+  .alert-bar.warn{background:var(--brass);}
+  .alert-bar.danger{background:var(--oxide);}
+  .alert-module{color:var(--muted);font-size:12.5px;min-width:150px;}
+  .alert-name{flex:1;min-width:120px;}
+  .empty-note{padding:20px;color:var(--muted);font-size:14px;}
+
+  /* ---------- TOOLBAR / TABLE ---------- */
+  .toolbar{
+    display:flex;justify-content:space-between;align-items:center;
+    gap:14px;margin-bottom:16px;flex-wrap:wrap;
+  }
+  .toolbar-filters{display:flex;gap:10px;flex-wrap:wrap;flex:1;}
+  .field-input, .field-select{
+    padding:9px 12px;border:1px solid var(--border-light);
+    background:#fff;font-size:14px;color:var(--ink);font-family:inherit;
+    min-width:160px;
+  }
+  .btn{
+    font-weight:600;font-size:14px;padding:10px 20px;
+    border:1px solid var(--ink);background:var(--ink);color:var(--parchment);
+    cursor:pointer;
+  }
+  .btn:hover{background:#333527;}
+  .btn.secondary{background:transparent;color:var(--ink);}
+  .btn.secondary:hover{background:rgba(0,0,0,.05);}
+
+  .table-wrap{background:var(--panel);border:1px solid var(--border-light);overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:640px;}
+  th{
+    text-align:left;padding:13px 18px;border-bottom:2px solid var(--border-light);
+    font-weight:600;font-size:12.5px;color:var(--muted);
+    text-transform:none;white-space:nowrap;
+  }
+  td{padding:12px 18px;border-bottom:1px solid var(--border-light);vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:rgba(184,134,58,.07);}
+  td.actions{white-space:nowrap;text-align:right;}
+  .row-action{font-size:13px;font-weight:600;cursor:pointer;margin-left:14px;color:var(--ink);}
+  .row-action:hover{color:var(--brass-deep);}
+  .row-action.del:hover{color:var(--oxide);}
+
+  .badge{
+    display:inline-block;padding:3px 10px 3px 9px;font-size:12px;font-weight:500;
+    border-left:3px solid var(--muted);color:var(--muted);background:rgba(0,0,0,.03);
+    white-space:nowrap;
+  }
+  .badge.ok{border-color:var(--moss);color:var(--moss);background:rgba(85,107,74,.09);}
+  .badge.warn{border-color:var(--brass);color:var(--brass-deep);background:rgba(184,134,58,.1);}
+  .badge.danger{border-color:var(--oxide);color:var(--oxide);background:rgba(140,59,46,.09);}
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;background:rgba(30,32,25,.55);
+    align-items:center;justify-content:center;padding:20px;z-index:50;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--panel);width:480px;max-width:100%;max-height:90vh;overflow-y:auto;
+    border-top:4px solid var(--brass);padding:26px 28px 28px;
+  }
+  .modal h2{margin:0 0 18px;font-size:19px;font-weight:600;}
+  .form-grid{display:flex;flex-direction:column;gap:14px;}
+  .form-row label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:#3a3928;}
+  .form-row input, .form-row select{
+    width:100%;padding:10px 12px;border:1px solid var(--border-light);
+    background:#fff;font-size:14px;font-family:inherit;color:var(--ink);
+  }
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:880px){
+    .app{flex-direction:column;}
+    .sidebar{width:100%;flex-direction:row;align-items:center;border-right:none;border-bottom:3px solid var(--brass);}
+    .sidebar-header{border-bottom:none;padding:12px 16px;}
+    .brand-sub{display:none;}
+    .nav{padding:0 8px;overflow-x:auto;}
+    .nav ul{flex-direction:row;}
+    .nav a{flex-direction:column;gap:4px;font-size:11px;padding:8px 10px;text-align:center;}
+    .sidebar-footer{display:none;}
+    .topbar{padding:22px 22px 16px;}
+    .content{padding:20px 22px 50px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <svg class="crest" viewBox="0 0 48 48">
+        <path d="M24 3 L43 10 V22 C43 34 35 42 24 45 C13 42 5 34 5 22 V10 Z" fill="rgba(184,134,58,.14)" stroke="#B8863A" stroke-width="1.6"/>
+        <path d="M24 13.5l2.5 5.1 5.6.8-4 4 1 5.6-5.1-2.7-5.1 2.7 1-5.6-4-4 5.6-.8z" fill="#B8863A"/>
+      </svg>
+      <div>
+        <div class="brand-name">SGO</div>
+        <div class="brand-sub">Sistema de Gestão Operacional</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <ul id="navList"></ul>
+    </nav>
+    <div class="sidebar-footer">
+      Efetivo, frota, saúde e suprimento<br>Ambiente de demonstração
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="moduleTitle">Painel</h1>
+        <p class="subtitle" id="moduleSubtitle">Visão geral da unidade</p>
+      </div>
+      <div class="today" id="todayLabel"></div>
+    </header>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- ICONS ---------------- */
+  const ICONS = {
+    painel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>',
+    frotas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="12" height="8" rx="1"/><path d="M14 11h4l3 3v2h-7z"/><circle cx="6.5" cy="18.5" r="1.6"/><circle cx="17" cy="18.5" r="1.6"/></svg>',
+    militares: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.4 2.5-6 5.5-6s5.5 2.6 5.5 6"/><circle cx="17.3" cy="9.2" r="2.4"/><path d="M15.8 20c.1-2.6 1.7-4.6 3.7-5.4"/></svg>',
+    medicamentos: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9.5" width="18" height="5" rx="2.5"/><line x1="12" y1="9.5" x2="12" y2="14.5"/></svg>',
+    aprovisionamento: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5l9-4.5 9 4.5-9 4.5-9-4.5z"/><path d="M3 7.5v9l9 4.5 9-4.5v-9"/><path d="M12 12v9"/></svg>',
+    armamento: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3.3 7.8-7 9-3.7-1.2-7-4-7-9V6z"/></svg>'
+  };
+
+  /* ---------------- REFERENCE LISTS ---------------- */
+  const SECOES = ['1ª Companhia','2ª Companhia','3ª Companhia','Companhia de Comando','Esquadrão de Cavalaria','Bateria de Artilharia','Pelotão de Engenharia','Seção de Comunicações','Seção de Saúde','Seção de Intendência'];
+  const ARMAS = ['Infantaria','Cavalaria','Artilharia','Engenharia','Comunicações','Intendência','Saúde','Material Bélico','Quadro Complementar'];
+  const POSTOS = ['Cel','Ten Cel','Maj','Cap','1º Ten','2º Ten','Asp Of','ST','1º Sgt','2º Sgt','3º Sgt','Cb','Sd'];
+  const MED_CATEGORIAS = ['Analgésico','Antibiótico','Antialérgico','Soro/Solução','Material de Curativo','Outro'];
+  const APROV_CATEGORIAS = ['Alimentação','Fardamento','Material de Acampamento','Material de Expediente','Combustível','Outro'];
+  const ARM_CATEGORIAS = ['Fuzil','Pistola','Metralhadora','Lançador','Equipamento Diverso'];
+  const UNIDADES_MED = ['comprimidos','ampolas','frascos','caixas','unidades'];
+
+  const STATUS_CLASS = {
+    'Operacional':'ok','Manutenção':'warn','Baixada':'danger',
+    'Ativo':'ok','Licença':'warn','Missão':'neutral','Instrução':'neutral',
+    'Disponível':'ok','Indisponível':'danger',
+    'Normal':'ok','Baixo':'warn','A vencer':'warn','Vencido':'danger','Esgotado':'danger'
+  };
+  function badgeClass(status){ return STATUS_CLASS[status] || 'neutral'; }
+
+  /* ---------------- STATUS COMPUTATION ---------------- */
+  function computeMedStatus(item){
+    const qty = Number(item.quantidade)||0;
+    const min = Number(item.quantidadeMinima)||0;
+    if (qty <= 0) return 'Esgotado';
+    const today = new Date();
+    const val = item.validade ? new Date(item.validade+'T00:00:00') : null;
+    if (val && val < today) return 'Vencido';
+    if (qty < min) return 'Baixo';
+    if (val){
+      const days = Math.ceil((val-today)/(1000*60*60*24));
+      if (days <= 30) return 'A vencer';
+    }
+    return 'Normal';
+  }
+  function computeAprovStatus(item){
+    const qty = Number(item.quantidade)||0;
+    const min = Number(item.quantidadeMinima)||0;
+    if (qty <= 0) return 'Esgotado';
+    if (qty < min) return 'Baixo';
+    return 'Disponível';
+  }
+  function formatDate(value){
+    if(!value) return '—';
+    const d = new Date(value+'T00:00:00');
+    if (isNaN(d)) return '—';
+    return d.toLocaleDateString('pt-BR');
+  }
+  function fmtVal(v){ return (v===undefined||v===null||v==='') ? '—' : v; }
+
+  /* ---------------- MODULE CONFIG ---------------- */
+  const moduleConfigs = [
+    {
+      id:'frotas', label:'Frotas', icon:ICONS.frotas,
+      subtitle:'Registro e situação das viaturas da unidade',
+      nameKey:'prefixo', filterKey:'secao', filterOptions:SECOES,
+      getStatus:item=>item.status,
+      columns:[
+        {key:'prefixo', label:'Prefixo'},
+        {key:'tipo', label:'Tipo de viatura'},
+        {key:'secao', label:'Seção'},
+        {key:'km', label:'Km atual', align:'right'},
+        {key:'revisao', label:'Última revisão', format:'date'},
+        {key:'status', label:'Situação', badge:true}
+      ],
+      fields:[
+        {key:'prefixo', label:'Prefixo', type:'text', required:true, placeholder:'Ex.: VTR-014'},
+        {key:'tipo', label:'Tipo de viatura', type:'text', required:true, placeholder:'Ex.: Viatura de transporte de tropa'},
+        {key:'secao', label:'Seção responsável', type:'select', options:SECOES, required:true},
+        {key:'km', label:'Km atual', type:'number', required:false},
+        {key:'revisao', label:'Última revisão', type:'date', required:false},
+        {key:'status', label:'Situação', type:'select', options:['Operacional','Manutenção','Baixada'], required:true}
+      ],
+      data:[
+        {id:'f1', prefixo:'VTR-014', tipo:'Viatura de Transporte de Tropa', secao:'1ª Companhia', km:48230, revisao:'2026-06-12', status:'Operacional'},
+        {id:'f2', prefixo:'VTR-022', tipo:'Ambulância', secao:'Seção de Saúde', km:31890, revisao:'2026-08-01', status:'Operacional'},
+        {id:'f3', prefixo:'VTR-007', tipo:'Viatura Blindada de Reconhecimento', secao:'Esquadrão de Cavalaria', km:52410, revisao:'2026-03-20', status:'Manutenção'},
+        {id:'f4', prefixo:'VTR-031', tipo:'Caminhão de Carga 5t', secao:'Seção de Intendência', km:67210, revisao:'2025-11-05', status:'Baixada'},
+        {id:'f5', prefixo:'VTR-018', tipo:'Viatura de Engenharia', secao:'Pelotão de Engenharia', km:22040, revisao:'2026-07-28', status:'Operacional'}
+      ]
+    },
+    {
+      id:'militares', label:'Militares', icon:ICONS.militares,
+      subtitle:'Registro de efetivo por seção e arma',
+      nameKey:'nome', filterKey:'arma', filterOptions:ARMAS,
+      getStatus:item=>item.status,
+      columns:[
+        {key:'nome', label:'Nome'},
+        {key:'posto', label:'Posto/Grad.'},
+        {key:'secao', label:'Seção'},
+        {key:'arma', label:'Arma/Quadro'},
+        {key:'matricula', label:'Matrícula'},
+        {key:'status', label:'Situação', badge:true}
+      ],
+      fields:[
+        {key:'nome', label:'Nome completo', type:'text', required:true},
+        {key:'posto', label:'Posto/Graduação', type:'select', options:POSTOS, required:true},
+        {key:'secao', label:'Seção', type:'select', options:SECOES, required:true},
+        {key:'arma', label:'Arma/Quadro', type:'select', options:ARMAS, required:true},
+        {key:'matricula', label:'Matrícula', type:'text', required:true},
+        {key:'status', label:'Situação', type:'select', options:['Ativo','Missão','Instrução','Licença'], required:true}
+      ],
+      data:[
+        {id:'m1', nome:'João Pedro Almeida', posto:'Cap', secao:'1ª Companhia', arma:'Infantaria', matricula:'12345-6', status:'Ativo'},
+        {id:'m2', nome:'Marcos Vinícius Ribeiro', posto:'1º Ten', secao:'Esquadrão de Cavalaria', arma:'Cavalaria', matricula:'23456-7', status:'Ativo'},
+        {id:'m3', nome:'Rafael Souza Lima', posto:'3º Sgt', secao:'Bateria de Artilharia', arma:'Artilharia', matricula:'34567-8', status:'Missão'},
+        {id:'m4', nome:'Bruno Costa Martins', posto:'Cb', secao:'Pelotão de Engenharia', arma:'Engenharia', matricula:'45678-9', status:'Instrução'},
+        {id:'m5', nome:'Felipe Nogueira Dias', posto:'2º Sgt', secao:'Seção de Comunicações', arma:'Comunicações', matricula:'56789-0', status:'Licença'},
+        {id:'m6', nome:'Diego Ferreira Rocha', posto:'Sd', secao:'Seção de Intendência', arma:'Intendência', matricula:'67890-1', status:'Ativo'}
+      ]
+    },
+    {
+      id:'medicamentos', label:'Medicamentos', icon:ICONS.medicamentos,
+      subtitle:'Estoque de medicamentos e material de saúde',
+      nameKey:'nome', filterKey:'categoria', filterOptions:MED_CATEGORIAS,
+      getStatus:item=>computeMedStatus(item),
+      columns:[
+        {key:'nome', label:'Medicamento'},
+        {key:'categoria', label:'Categoria'},
+        {key:'quantidade', label:'Quantidade', align:'right'},
+        {key:'unidade', label:'Unidade'},
+        {key:'quantidadeMinima', label:'Mínimo', align:'right'},
+        {key:'validade', label:'Validade', format:'date'},
+        {key:'status', label:'Situação', badge:true, computed:'med'}
+      ],
+      fields:[
+        {key:'nome', label:'Medicamento', type:'text', required:true},
+        {key:'categoria', label:'Categoria', type:'select', options:MED_CATEGORIAS, required:true},
+        {key:'quantidade', label:'Quantidade em estoque', type:'number', required:true},
+        {key:'unidade', label:'Unidade', type:'select', options:UNIDADES_MED, required:true},
+        {key:'quantidadeMinima', label:'Quantidade mínima', type:'number', required:true},
+        {key:'validade', label:'Validade', type:'date', required:true}
+      ],
+      data:[
+        {id:'d1', nome:'Dipirona 500mg', categoria:'Analgésico', quantidade:420, unidade:'comprimidos', quantidadeMinima:150, validade:'2027-02-15'},
+        {id:'d2', nome:'Amoxicilina 500mg', categoria:'Antibiótico', quantidade:60, unidade:'comprimidos', quantidadeMinima:100, validade:'2026-10-30'},
+        {id:'d3', nome:'Soro Fisiológico 0,9%', categoria:'Soro/Solução', quantidade:180, unidade:'frascos', quantidadeMinima:80, validade:'2026-09-25'},
+        {id:'d4', nome:'Loratadina 10mg', categoria:'Antialérgico', quantidade:0, unidade:'comprimidos', quantidadeMinima:50, validade:'2027-01-10'},
+        {id:'d5', nome:'Gaze Estéril', categoria:'Material de Curativo', quantidade:320, unidade:'unidades', quantidadeMinima:100, validade:'2028-05-01'}
+      ]
+    },
+    {
+      id:'aprovisionamento', label:'Aprovisionamento', icon:ICONS.aprovisionamento,
+      subtitle:'Suprimentos e material disponível para distribuição',
+      nameKey:'item', filterKey:'categoria', filterOptions:APROV_CATEGORIAS,
+      getStatus:item=>computeAprovStatus(item),
+      columns:[
+        {key:'item', label:'Item'},
+        {key:'categoria', label:'Categoria'},
+        {key:'quantidade', label:'Quantidade', align:'right'},
+        {key:'unidade', label:'Unidade'},
+        {key:'quantidadeMinima', label:'Mínimo', align:'right'},
+        {key:'secaoDestino', label:'Seção destino'},
+        {key:'status', label:'Situação', badge:true, computed:'aprov'}
+      ],
+      fields:[
+        {key:'item', label:'Item', type:'text', required:true},
+        {key:'categoria', label:'Categoria', type:'select', options:APROV_CATEGORIAS, required:true},
+        {key:'quantidade', label:'Quantidade disponível', type:'number', required:true},
+        {key:'unidade', label:'Unidade', type:'text', required:true, placeholder:'kg, litros, unidades...'},
+        {key:'quantidadeMinima', label:'Quantidade mínima', type:'number', required:true},
+        {key:'secaoDestino', label:'Seção de destino', type:'select', options:SECOES, required:true}
+      ],
+      data:[
+        {id:'p1', item:'Ração Operacional (kit)', categoria:'Alimentação', quantidade:640, unidade:'kits', quantidadeMinima:300, secaoDestino:'1ª Companhia'},
+        {id:'p2', item:'Uniforme de Campanha', categoria:'Fardamento', quantidade:85, unidade:'conjuntos', quantidadeMinima:100, secaoDestino:'2ª Companhia'},
+        {id:'p3', item:'Barraca Individual', categoria:'Material de Acampamento', quantidade:0, unidade:'unidades', quantidadeMinima:20, secaoDestino:'3ª Companhia'},
+        {id:'p4', item:'Diesel S10', categoria:'Combustível', quantidade:5200, unidade:'litros', quantidadeMinima:2000, secaoDestino:'Seção de Intendência'},
+        {id:'p5', item:'Material de Escritório', categoria:'Material de Expediente', quantidade:410, unidade:'unidades', quantidadeMinima:150, secaoDestino:'Companhia de Comando'}
+      ]
+    },
+    {
+      id:'armamento', label:'Armamento', icon:ICONS.armamento,
+      subtitle:'Estoque na reserva de armamento da AMAN',
+      nameKey:'modelo', filterKey:'categoria', filterOptions:ARM_CATEGORIAS,
+      getStatus:item=>item.status,
+      columns:[
+        {key:'modelo', label:'Modelo/Tipo'},
+        {key:'categoria', label:'Categoria'},
+        {key:'quantidade', label:'Quantidade', align:'right'},
+        {key:'local', label:'Paiol/Local'},
+        {key:'status', label:'Situação', badge:true}
+      ],
+      fields:[
+        {key:'modelo', label:'Modelo/Tipo', type:'text', required:true},
+        {key:'categoria', label:'Categoria', type:'select', options:ARM_CATEGORIAS, required:true},
+        {key:'quantidade', label:'Quantidade em reserva', type:'number', required:true},
+        {key:'local', label:'Paiol/Local', type:'text', required:true, placeholder:'Ex.: Paiol Central – AMAN'},
+        {key:'status', label:'Situação', type:'select', options:['Disponível','Manutenção','Indisponível'], required:true}
+      ],
+      data:[
+        {id:'a1', modelo:'Fuzil IA2 5,56mm', categoria:'Fuzil', quantidade:540, local:'Paiol Central – AMAN', status:'Disponível'},
+        {id:'a2', modelo:'Pistola PT 92', categoria:'Pistola', quantidade:210, local:'Paiol Central – AMAN', status:'Disponível'},
+        {id:'a3', modelo:'Metralhadora MAG', categoria:'Metralhadora', quantidade:38, local:'Paiol Setorial – Cavalaria', status:'Manutenção'},
+        {id:'a4', modelo:'Lançador de Granadas', categoria:'Lançador', quantidade:22, local:'Paiol Central – AMAN', status:'Disponível'},
+        {id:'a5', modelo:'Equipamento de Pontaria Noturna', categoria:'Equipamento Diverso', quantidade:15, local:'Paiol Setorial – Engenharia', status:'Indisponível'}
+      ]
+    }
+  ];
+
+  const navItems = [{id:'painel', label:'Painel', icon:ICONS.painel}].concat(
+    moduleConfigs.map(m=>({id:m.id, label:m.label, icon:m.icon}))
+  );
+
+  const uiState = {};
+  moduleConfigs.forEach(m=>{ uiState[m.id] = {search:'', filter:'Todos'}; });
+  let currentModule = 'painel';
+
+  /* ---------------- NAV ---------------- */
+  function buildNav(){
+    const ul = document.getElementById('navList');
+    ul.innerHTML = navItems.map(n=>
+      '<li><a class="nav-link" data-id="'+n.id+'">'+n.icon+'<span>'+n.label+'</span></a></li>'
+    ).join('');
+    ul.querySelectorAll('.nav-link').forEach(a=>{
+      a.addEventListener('click', ()=> goTo(a.dataset.id));
+    });
+  }
+
+  function goTo(id){
+    currentModule = id;
+    document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('active', a.dataset.id===id));
+    if(id==='painel') renderDashboard();
+    else renderModulePage(moduleConfigs.find(m=>m.id===id));
+  }
+
+  /* ---------------- DASHBOARD ---------------- */
+  function collectAlerts(){
+    const alerts = [];
+    moduleConfigs.forEach(cfg=>{
+      cfg.data.forEach(item=>{
+        const status = cfg.getStatus(item);
+        const cls = badgeClass(status);
+        if(cls==='warn' || cls==='danger'){
+          alerts.push({module:cfg.label, name:item[cfg.nameKey], status, cls});
+        }
+      });
+    });
+    return alerts;
+  }
+
+  function renderDashboard(){
+    document.getElementById('moduleTitle').textContent = 'Painel';
+    document.getElementById('moduleSubtitle').textContent = 'Visão geral da unidade — ambiente de demonstração com dados fictícios';
+
+    const frotas = moduleConfigs.find(m=>m.id==='frotas').data;
+    const militares = moduleConfigs.find(m=>m.id==='militares').data;
+    const armamento = moduleConfigs.find(m=>m.id==='armamento').data;
+    const operacionais = frotas.filter(f=>f.status==='Operacional').length;
+    const totalArmamento = armamento.reduce((s,a)=>s+(Number(a.quantidade)||0),0);
+    const alerts = collectAlerts();
+
+    const stats = [
+      {label:'Efetivo total', value:militares.length},
+      {label:'Viaturas operacionais', value: operacionais+' / '+frotas.length},
+      {label:'Armamento em reserva', value: totalArmamento},
+      {label:'Alertas ativos', value: alerts.length}
+    ];
+
+    let html = '<div class="stats-grid">' + stats.map(s=>
+      '<div class="stat-card"><div class="stat-number">'+s.value+'</div><div class="stat-label">'+s.label+'</div></div>'
+    ).join('') + '</div>';
+
+    html += '<div class="panel-block"><h2>Alertas</h2>';
+    if(alerts.length===0){
+      html += '<div class="empty-note">Nenhum alerta no momento.</div>';
+    } else {
+      html += alerts.map(a=>
+        '<div class="alert-row"><span class="alert-bar '+a.cls+'"></span>'+
+        '<span class="alert-module">'+a.module+'</span>'+
+        '<span class="alert-name">'+a.name+'</span>'+
+        '<span class="badge '+a.cls+'">'+a.status+'</span></div>'
+      ).join('');
+    }
+    html += '</div>';
+
+    document.getElementById('content').innerHTML = html;
+  }
+
+  /* ---------------- MODULE TABLE PAGE ---------------- */
+  function filteredData(cfg){
+    const st = uiState[cfg.id];
+    return cfg.data.filter(item=>{
+      const matchSearch = !st.search || cfg.fields.some(f=>
+        f.type!=='number' && (item[f.key]||'').toString().toLowerCase().includes(st.search.toLowerCase())
+      );
+      const matchFilter = st.filter==='Todos' || item[cfg.filterKey]===st.filter;
+      return matchSearch && matchFilter;
+    });
+  }
+
+  function renderCell(cfg, col, item){
+    if(col.computed==='med'){
+      const s = computeMedStatus(item);
+      return '<span class="badge '+badgeClass(s)+'">'+s+'</span>';
+    }
+    if(col.computed==='aprov'){
+      const s = computeAprovStatus(item);
+      return '<span class="badge '+badgeClass(s)+'">'+s+'</span>';
+    }
+    const val = item[col.key];
+    if(col.format==='date') return formatDate(val);
+    if(col.badge) return '<span class="badge '+badgeClass(val)+'">'+val+'</span>';
+    return fmtVal(val);
+  }
+
+  function renderModulePage(cfg){
+    document.getElementById('moduleTitle').textContent = cfg.label;
+    document.getElementById('moduleSubtitle').textContent = cfg.subtitle;
+
+    const st = uiState[cfg.id];
+    const rows = filteredData(cfg);
+
+    let html = '<div class="toolbar">';
+    html += '<div class="toolbar-filters">';
+    html += '<input class="field-input" id="searchInput" type="text" placeholder="Buscar..." value="'+st.search.replace(/"/g,'&quot;')+'">';
+    html += '<select class="field-select" id="filterSelect"><option'+(st.filter==='Todos'?' selected':'')+'>Todos</option>' +
+      cfg.filterOptions.map(o=>'<option'+(st.filter===o?' selected':'')+'>'+o+'</option>').join('') + '</select>';
+    html += '</div>';
+    html += '<button class="btn" id="addBtn">Adicionar registro</button>';
+    html += '</div>';
+
+    html += '<div class="table-wrap"><table><thead><tr>';
+    cfg.columns.forEach(col=>{
+      html += '<th style="'+(col.align==='right'?'text-align:right':'')+'">'+col.label+'</th>';
+    });
+    html += '<th style="text-align:right">Ações</th></tr></thead><tbody>';
+
+    if(rows.length===0){
+      html += '<tr><td colspan="'+(cfg.columns.length+1)+'"><div class="empty-note">Nenhum registro encontrado.</div></td></tr>';
+    } else {
+      rows.forEach(item=>{
+        html += '<tr>';
+        cfg.columns.forEach(col=>{
+          html += '<td style="'+(col.align==='right'?'text-align:right':'')+'">'+renderCell(cfg,col,item)+'</td>';
+        });
+        html += '<td class="actions">'+
+          '<span class="row-action edit" data-id="'+item.id+'">Editar</span>'+
+          '<span class="row-action del" data-id="'+item.id+'">Excluir</span>'+
+          '</td>';
+        html += '</tr>';
+      });
+    }
+    html += '</tbody></table></div>';
+
+    document.getElementById('content').innerHTML = html;
+
+    document.getElementById('searchInput').addEventListener('input', e=>{
+      st.search = e.target.value;
+      renderModulePage(cfg);
+      document.getElementById('searchInput').focus();
+      const v = document.getElementById('searchInput');
+      v.setSelectionRange(v.value.length, v.value.length);
+    });
+    document.getElementById('filterSelect').addEventListener('change', e=>{
+      st.filter = e.target.value;
+      renderModulePage(cfg);
+    });
+    document.getElementById('addBtn').addEventListener('click', ()=> openForm(cfg, null));
+    document.querySelectorAll('.row-action.edit').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const item = cfg.data.find(d=>d.id===el.dataset.id);
+        openForm(cfg, item);
+      });
+    });
+    document.querySelectorAll('.row-action.del').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        if(confirm('Remover este registro?')){
+          cfg.data = cfg.data.filter(d=>d.id!==el.dataset.id);
+          const idx = moduleConfigs.findIndex(m=>m.id===cfg.id);
+          moduleConfigs[idx] = cfg;
+          renderModulePage(cfg);
+        }
+      });
+    });
+  }
+
+  /* ---------------- MODAL FORM ---------------- */
+  function openForm(cfg, existing){
+    const overlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById('modal');
+    const isEdit = !!existing;
+
+    let html = '<h2>'+(isEdit ? 'Editar registro' : 'Adicionar registro')+' — '+cfg.label+'</h2>';
+    html += '<div class="form-grid">';
+    cfg.fields.forEach(f=>{
+      const val = existing ? (existing[f.key]!==undefined ? existing[f.key] : '') : '';
+      html += '<div class="form-row"><label for="field-'+f.key+'">'+f.label+'</label>';
+      if(f.type==='select'){
+        html += '<select id="field-'+f.key+'">' + f.options.map(o=>
+          '<option'+(String(val)===o?' selected':'')+'>'+o+'</option>'
+        ).join('') + '</select>';
+      } else {
+        html += '<input id="field-'+f.key+'" type="'+f.type+'" value="'+(val===undefined||val===null?'':val)+'" placeholder="'+(f.placeholder||'')+'">';
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div class="modal-actions">';
+    html += '<button class="btn secondary" id="cancelBtn">Cancelar</button>';
+    html += '<button class="btn" id="saveBtn">'+(isEdit?'Salvar alterações':'Adicionar')+'</button>';
+    html += '</div>';
+
+    modal.innerHTML = html;
+    overlay.classList.add('open');
+
+    document.getElementById('cancelBtn').addEventListener('click', closeForm);
+    overlay.addEventListener('click', function overlayClick(e){
+      if(e.target===overlay){ closeForm(); overlay.removeEventListener('click', overlayClick); }
+    });
+    document.getElementById('saveBtn').addEventListener('click', ()=>{
+      const obj = existing ? Object.assign({}, existing) : {};
+      let valid = true;
+      cfg.fields.forEach(f=>{
+        const el = document.getElementById('field-'+f.key);
+        const v = el.value;
+        if(f.required && !v){ el.style.borderColor = '#8C3B2E'; valid = false; }
+        else { el.style.borderColor = ''; }
+        obj[f.key] = f.type==='number' ? (v===''? '' : Number(v)) : v;
+      });
+      if(!valid) return;
+      if(isEdit){
+        const idx = cfg.data.findIndex(d=>d.id===existing.id);
+        cfg.data[idx] = obj;
+      } else {
+        obj.id = 'id-'+Date.now()+'-'+Math.floor(Math.random()*1000);
+        cfg.data.push(obj);
+      }
+      closeForm();
+      renderModulePage(cfg);
+    });
+  }
+  function closeForm(){
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  /* ---------------- INIT ---------------- */
+  function init(){
+    buildNav();
+    const today = new Date();
+    document.getElementById('todayLabel').textContent =
+      today.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+    goTo('painel');
+  }
+  init();
+})();
+</script>
+</body>
+</html>
