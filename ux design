@@ -1,0 +1,489 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Wireframes do SGO</title>
+<style>
+  /* Layout: documento de UX em coluna única — capa, arquitetura da informação,
+     fluxos de tarefa e wireframes anotados, cada bloco com legenda numerada. */
+  :root{
+    --paper:#EDE7D4;
+    --panel:#F8F4E7;
+    --ink:#2A2B20;
+    --muted:#6E6A53;
+    --line:#8D876A;
+    --grid: rgba(42,43,32,0.07);
+    --accent:#B2492E;   /* lápis vermelho de anotação */
+    --accent2:#3E5C76;  /* lápis azul de fluxo */
+    --ok:#4C6444;
+    --warn:#B2492E;
+    --danger:#8C3B2E;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#1B1D16;
+      --panel:#222419;
+      --ink:#E7E2CE;
+      --muted:#9C9880;
+      --line:#4B4F3B;
+      --grid: rgba(231,226,206,0.06);
+      --accent:#D97A52;
+      --accent2:#7FA6C9;
+      --ok:#7FA06E;
+      --warn:#D97A52;
+      --danger:#C9705C;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#1B1D16;
+    --panel:#222419;
+    --ink:#E7E2CE;
+    --muted:#9C9880;
+    --line:#4B4F3B;
+    --grid: rgba(231,226,206,0.06);
+    --accent:#D97A52;
+    --accent2:#7FA6C9;
+    --ok:#7FA06E;
+    --warn:#D97A52;
+    --danger:#C9705C;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    margin:0;
+    padding-inline:42px;
+    padding-block:48px 80px;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  h1,h2,h3{font-family:'Oswald', sans-serif; font-weight:600; text-wrap:balance;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .doc{max-width:980px;margin:0 auto;}
+
+  /* ---- capa ---- */
+  .cover{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;margin-bottom:40px;
+    display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;
+  }
+  .cover h1{font-size:clamp(28px,4vw,40px);margin:0 0 8px;letter-spacing:.2px;}
+  .cover p{margin:0;color:var(--muted);font-size:15px;max-width:52ch;}
+  .cover .meta{text-align:right;font-size:12.5px;color:var(--muted);line-height:1.7;}
+  .meta .mono{color:var(--ink);}
+
+  section{margin-bottom:56px;}
+  .section-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px;}
+  .section-num{font-family:'IBM Plex Mono', monospace;font-size:13px;color:var(--accent);}
+  section h2{font-size:22px;margin:0;}
+  .section-intro{color:var(--muted);font-size:15px;max-width:68ch;margin:10px 0 24px;line-height:1.55;}
+
+  ul.principles{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;}
+  ul.principles li{border:1px solid var(--line);background:var(--panel);padding:16px 18px;font-size:14px;line-height:1.5;}
+  ul.principles strong{display:block;font-family:'Oswald',sans-serif;font-weight:600;font-size:15px;margin-bottom:4px;}
+
+  /* ---- mermaid wrappers ---- */
+  .diagram-wrap{
+    border:1px solid var(--line);background:var(--panel);
+    padding:22px;overflow-x:auto;margin-bottom:10px;
+  }
+  .diagram-caption{font-size:13.5px;color:var(--muted);margin:0 0 28px;max-width:70ch;}
+  .flows-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:24px;}
+
+  /* ---- wireframes ---- */
+  .wf-block{margin-bottom:44px;}
+  .wf-label{font-family:'IBM Plex Mono', monospace;font-size:12.5px;color:var(--muted);margin-bottom:10px;letter-spacing:.2px;}
+  .wf-frame{
+    border:1px solid var(--line);background:var(--panel);
+    overflow-x:auto;
+  }
+  .wf-scale{min-width:760px;display:flex;}
+
+  .num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:20px;height:20px;border-radius:50%;
+    background:var(--accent);color:var(--paper);
+    font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;
+    flex-shrink:0;
+  }
+
+  .wf-line{height:7px;background:var(--line);opacity:.4;border-radius:1px;}
+  .w-20{width:20%;} .w-30{width:30%;} .w-35{width:35%;} .w-40{width:40%;}
+  .w-55{width:55%;} .w-60{width:60%;} .w-70{width:70%;} .w-90{width:90%;} .w-100{width:100%;}
+
+  /* dashboard wireframe */
+  .wf-dashboard{display:flex;width:100%;}
+  .wf-sidebar{
+    width:190px;flex-shrink:0;border-right:1px dashed var(--line);
+    padding:16px 14px;display:flex;flex-direction:column;gap:10px;position:relative;
+  }
+  .wf-sidebar .num{position:absolute;top:10px;right:10px;}
+  .wf-brand{height:26px;width:70%;border:1px dashed var(--line);margin-bottom:6px;}
+  .wf-navitem{height:16px;border:1px dashed var(--line);background:var(--grid);}
+  .wf-main{flex:1;padding:18px 20px;display:flex;flex-direction:column;gap:18px;min-width:0;}
+  .wf-topbar{display:flex;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--line);}
+  .wf-stats{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding-top:4px;}
+  .wf-stats .num{position:absolute;top:-16px;left:0;}
+  .wf-stat{border:1px dashed var(--line);border-top:3px solid var(--accent2);padding:12px 10px;display:flex;flex-direction:column;gap:8px;}
+  .wf-alerts{position:relative;border:1px dashed var(--line);padding:14px 16px 16px;display:flex;flex-direction:column;gap:9px;}
+  .wf-alerts .num{position:absolute;top:-10px;left:-10px;}
+  .wf-alert-row{display:flex;align-items:center;gap:10px;}
+  .wf-sev{width:4px;height:16px;flex-shrink:0;}
+  .wf-sev.warn{background:var(--warn);} .wf-sev.danger{background:var(--danger);}
+  .wf-chip{width:58px;height:14px;border:1px dashed var(--line);flex-shrink:0;}
+
+  /* listing wireframe */
+  .wf-listing{width:100%;padding:18px 20px;display:flex;flex-direction:column;gap:14px;}
+  .wf-toolbar{position:relative;display:flex;gap:10px;align-items:center;}
+  .wf-toolbar .num{position:absolute;top:-16px;left:0;}
+  .wf-search{height:22px;flex:1;max-width:260px;border:1px dashed var(--line);}
+  .wf-filter{height:22px;width:120px;border:1px dashed var(--line);}
+  .wf-addbtn{height:22px;width:140px;border:1px solid var(--ink);background:var(--grid);margin-left:auto;}
+  .wf-table{border:1px solid var(--line);}
+  .wf-trow{display:grid;grid-template-columns:1.3fr 1fr 1fr .8fr 1fr .9fr;gap:10px;padding:10px 14px;align-items:center;border-bottom:1px solid var(--line);}
+  .wf-trow:last-child{border-bottom:none;}
+  .wf-trow.head .wf-line{opacity:.7;height:6px;}
+  .wf-status-chip{height:16px;border:1px dashed var(--line);position:relative;}
+  .wf-status-chip.ok{border-left:3px solid var(--ok);}
+  .wf-status-chip.warn{border-left:3px solid var(--warn);}
+  .wf-status-chip.danger{border-left:3px solid var(--danger);}
+  .wf-actions{display:flex;gap:10px;}
+  .wf-actions .wf-line{height:6px;width:34px;}
+  .wf-table-wrap{position:relative;}
+  .wf-table-wrap .num{position:absolute;top:-10px;left:-10px;z-index:1;}
+
+  /* modal wireframe */
+  .wf-modal-stage{width:100%;padding:30px;display:flex;justify-content:center;position:relative;background:
+    repeating-linear-gradient(135deg, var(--grid) 0 2px, transparent 2px 10px);}
+  .wf-modal{width:360px;border:1px solid var(--ink);background:var(--paper);padding:20px;display:flex;flex-direction:column;gap:14px;position:relative;}
+  .wf-modal .num{position:absolute;top:-10px;right:-10px;}
+  .wf-field{display:flex;flex-direction:column;gap:6px;}
+  .wf-input{height:20px;border:1px dashed var(--line);}
+  .wf-modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:6px;}
+  .wf-btn{height:24px;width:90px;border:1px solid var(--ink);}
+  .wf-btn.primary{background:var(--ink);}
+
+  .legend{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:7px;}
+  .legend li{display:flex;gap:10px;font-size:13.5px;color:var(--muted);line-height:1.5;}
+  .legend .num{margin-top:1px;}
+  .legend b{color:var(--ink);font-weight:600;}
+
+  /* estados */
+  .states-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+  .state-card{border:1px solid var(--line);background:var(--panel);padding:16px 18px;border-top:3px solid var(--muted);}
+  .state-card.warn{border-top-color:var(--warn);}
+  .state-card.danger{border-top-color:var(--danger);}
+  .state-card h3{font-size:14.5px;margin:0 0 6px;font-weight:600;}
+  .state-card p{font-size:13.5px;color:var(--muted);margin:0;line-height:1.5;}
+
+  /* specs */
+  .spec-list{list-style:none;margin:0;padding:0;border:1px solid var(--line);background:var(--panel);}
+  .spec-list li{display:grid;grid-template-columns:220px 1fr;gap:16px;padding:12px 18px;border-bottom:1px solid var(--line);font-size:14px;}
+  .spec-list li:last-child{border-bottom:none;}
+  .spec-list .k{font-family:'IBM Plex Mono', monospace;color:var(--accent2);font-size:12.5px;align-self:center;}
+
+  footer{border-top:1px solid var(--line);padding-top:18px;margin-top:20px;font-size:12.5px;color:var(--muted);}
+
+  @media (max-width:860px){
+    body{padding-inline:20px;}
+    .cover{flex-direction:column;align-items:flex-start;}
+    .cover .meta{text-align:left;}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="doc">
+
+  <div class="cover">
+    <div>
+      <h1>UX design — SGO</h1>
+      <p>Arquitetura da informação, fluxos de tarefa e wireframes anotados do Sistema de Gestão Operacional, para uso em desktop.</p>
+    </div>
+    <div class="meta">
+      Foco: <span class="mono">desktop ≥ 1280px</span><br>
+      Módulos: <span class="mono">6</span><br>
+      Revisão: <span class="mono">05 out 2026</span>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-head"><span class="section-num">01</span><h2>Princípios de UX</h2></div>
+    <p class="section-intro">O sistema é operado por quem precisa de uma resposta rápida — "está tudo em ordem?" — antes de decidir onde agir. As decisões de layout partem disso.</p>
+    <ul class="principles">
+      <li><strong>Alerta antes de detalhe</strong>Qualquer situação fora do normal aparece no Painel antes de exigir que o usuário abra um módulo.</li>
+      <li><strong>Um padrão, cinco módulos</strong>Frotas, Militares, Medicamentos, Aprovisionamento e Armamento compartilham a mesma estrutura de tela — quem aprende um, opera todos.</li>
+      <li><strong>Situação por cor e por texto</strong>Nenhum estado depende só da cor: todo selo de situação também traz a palavra, para leitura rápida e acessível.</li>
+      <li><strong>Registro em poucos cliques</strong>Adicionar ou editar um item nunca sai do contexto da lista — o formulário abre em sobreposição, não em outra tela.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">02</span><h2>Arquitetura da informação</h2></div>
+    <p class="section-intro">Estrutura rasa, de dois níveis: o Painel concentra a leitura geral e os seis destinos ficam sempre visíveis na navegação lateral, sem submenus.</p>
+    <div class="diagram-wrap">
+<pre class="mermaid">
+graph TD
+  P[Painel] --> F[Frotas]
+  P --> M[Militares]
+  P --> R[Medicamentos]
+  P --> A[Aprovisionamento]
+  P --> G[Armamento]
+  F --> F1[Registro de viatura]
+  M --> M1[Registro de militar]
+  R --> R1[Registro de medicamento]
+  A --> A1[Registro de item]
+  G --> G1[Registro de armamento]
+</pre>
+    </div>
+    <p class="diagram-caption">Cada módulo tem exatamente uma ação de criação — "adicionar registro" — mantendo o mesmo rótulo e a mesma posição em toda a aplicação.</p>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">03</span><h2>Fluxos de tarefa</h2></div>
+    <p class="section-intro">Dois fluxos representativos: um de registro simples e um de resposta a alerta, que é o ponto de partida mais comum de uso real.</p>
+    <div class="flows-grid">
+      <div>
+        <div class="diagram-wrap">
+<pre class="mermaid">
+flowchart TD
+  A[Abrir modulo Frotas] --> B[Clicar em Adicionar registro]
+  B --> C[Preencher prefixo, tipo, secao e situacao]
+  C --> D{Campos obrigatorios preenchidos?}
+  D -- Nao --> C
+  D -- Sim --> E[Salvar registro]
+  E --> F[Viatura aparece na tabela]
+</pre>
+        </div>
+        <p class="diagram-caption"><b class="mono" style="color:var(--accent2)">Fluxo A</b> — Registrar uma nova viatura.</p>
+      </div>
+      <div>
+        <div class="diagram-wrap">
+<pre class="mermaid">
+flowchart TD
+  A[Painel mostra um alerta] --> B[Selecionar o item do alerta]
+  B --> C[Abrir o modulo correspondente]
+  C --> D[Localizar o item com busca ou filtro]
+  D --> E[Atualizar a quantidade]
+  E --> F{Quantidade acima do minimo?}
+  F -- Sim --> G[Situacao muda para Normal ou Disponivel]
+  F -- Nao --> H[Alerta permanece ativo]
+</pre>
+        </div>
+        <p class="diagram-caption"><b class="mono" style="color:var(--accent2)">Fluxo B</b> — Resolver um alerta de estoque baixo.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">04</span><h2>Wireframes — desktop</h2></div>
+    <p class="section-intro">Três telas cobrem toda a aplicação: o Painel é única; a listagem e o formulário se repetem, idênticos em estrutura, nos cinco módulos de gestão.</p>
+
+    <div class="wf-block">
+      <div class="wf-label">4.1 — painel</div>
+      <div class="wf-frame"><div class="wf-scale wf-dashboard">
+        <div class="wf-sidebar">
+          <span class="num">1</span>
+          <div class="wf-brand"></div>
+          <div class="wf-navitem"></div>
+          <div class="wf-navitem"></div>
+          <div class="wf-navitem"></div>
+          <div class="wf-navitem"></div>
+          <div class="wf-navitem"></div>
+          <div class="wf-navitem"></div>
+        </div>
+        <div class="wf-main">
+          <div class="wf-topbar"><div class="wf-line w-30"></div><div class="wf-line w-20"></div></div>
+          <div class="wf-stats">
+            <span class="num">2</span>
+            <div class="wf-stat"><div class="wf-line w-40"></div><div class="wf-line w-70"></div></div>
+            <div class="wf-stat"><div class="wf-line w-40"></div><div class="wf-line w-70"></div></div>
+            <div class="wf-stat"><div class="wf-line w-40"></div><div class="wf-line w-70"></div></div>
+            <div class="wf-stat"><div class="wf-line w-40"></div><div class="wf-line w-70"></div></div>
+          </div>
+          <div class="wf-alerts">
+            <span class="num">3</span>
+            <div class="wf-alert-row"><span class="wf-sev warn"></span><div class="wf-line w-55"></div><span class="wf-chip"></span></div>
+            <div class="wf-alert-row"><span class="wf-sev danger"></span><div class="wf-line w-40"></div><span class="wf-chip"></span></div>
+            <div class="wf-alert-row"><span class="wf-sev warn"></span><div class="wf-line w-60"></div><span class="wf-chip"></span></div>
+          </div>
+        </div>
+      </div></div>
+      <ol class="legend">
+        <li><span class="num">1</span><span><b>Navegação fixa.</b> Os seis destinos ficam sempre visíveis; não há menu para abrir.</span></li>
+        <li><span class="num">2</span><span><b>Indicadores-chave.</b> Respondem "está tudo certo?" sem exigir que se abra nenhum módulo.</span></li>
+        <li><span class="num">3</span><span><b>Alertas priorizados.</b> Reúne, num único ponto, toda ocorrência fora do normal em qualquer módulo.</span></li>
+      </ol>
+    </div>
+
+    <div class="wf-block">
+      <div class="wf-label">4.2 — listagem de módulo (padrão para frotas, militares, medicamentos, aprovisionamento e armamento)</div>
+      <div class="wf-frame"><div class="wf-scale"><div class="wf-listing" style="width:100%">
+        <div class="wf-toolbar">
+          <span class="num">1</span>
+          <div class="wf-search"></div>
+          <div class="wf-filter"></div>
+          <div class="wf-addbtn"></div>
+        </div>
+        <div class="wf-table-wrap">
+          <span class="num">3</span>
+          <div class="wf-table">
+            <div class="wf-trow head"><div class="wf-line w-90"></div><div class="wf-line w-90"></div><div class="wf-line w-90"></div><div class="wf-line w-70"></div><div class="wf-status-chip" style="border:none"></div><div class="wf-line w-55"></div></div>
+            <div class="wf-trow"><div class="wf-line w-90"></div><div class="wf-line w-70"></div><div class="wf-line w-80"></div><div class="wf-line w-55"></div><div class="wf-status-chip ok"></div><div class="wf-actions"><span class="num" style="opacity:0;position:static"></span><div class="wf-line"></div><div class="wf-line"></div></div></div>
+            <div class="wf-trow"><div class="wf-line w-80"></div><div class="wf-line w-60"></div><div class="wf-line w-90"></div><div class="wf-line w-40"></div><div class="wf-status-chip warn"></div><div class="wf-actions"><div class="wf-line"></div><div class="wf-line"></div></div></div>
+            <div class="wf-trow"><div class="wf-line w-70"></div><div class="wf-line w-80"></div><div class="wf-line w-55"></div><div class="wf-line w-60"></div><div class="wf-status-chip danger"></div><div class="wf-actions"><div class="wf-line"></div><div class="wf-line"></div></div></div>
+            <div class="wf-trow"><div class="wf-line w-90"></div><div class="wf-line w-55"></div><div class="wf-line w-70"></div><div class="wf-line w-80"></div><div class="wf-status-chip ok"></div><div class="wf-actions"><div class="wf-line"></div><div class="wf-line"></div></div></div>
+          </div>
+        </div>
+      </div></div></div>
+      <ol class="legend">
+        <li><span class="num">1</span><span><b>Busca e filtro na mesma barra.</b> Reduz o estoque de cliques para chegar a um item específico.</span></li>
+        <li><span class="num">2</span><span><b>Inclusão sempre no mesmo lugar.</b> O botão de adicionar registro ocupa a mesma posição nos cinco módulos.</span></li>
+        <li><span class="num">3</span><span><b>Situação por cor e texto.</b> A faixa à esquerda do selo marca a urgência antes mesmo de ler a palavra.</span></li>
+      </ol>
+    </div>
+
+    <div class="wf-block">
+      <div class="wf-label">4.3 — formulário (inclusão e edição)</div>
+      <div class="wf-frame"><div class="wf-scale" style="min-width:0;width:100%"><div class="wf-modal-stage" style="width:100%">
+        <div class="wf-modal">
+          <span class="num">2</span>
+          <div class="wf-line w-60" style="height:10px;"></div>
+          <div class="wf-field"><div class="wf-line w-30"></div><div class="wf-input"></div></div>
+          <div class="wf-field"><div class="wf-line w-30"></div><div class="wf-input"></div></div>
+          <div class="wf-field"><div class="wf-line w-30"></div><div class="wf-input"></div></div>
+          <div class="wf-field"><div class="wf-line w-30"></div><div class="wf-input"></div></div>
+          <div class="wf-modal-actions">
+            <span class="num" style="position:absolute;top:auto;right:auto;margin-top:-30px;margin-left:-6px;">3</span>
+            <div class="wf-btn"></div>
+            <div class="wf-btn primary"></div>
+          </div>
+        </div>
+      </div></div></div>
+      <ol class="legend">
+        <li><span class="num">1</span><span><b>Sobreposição, não navegação.</b> A lista ao fundo permanece visível — o contexto não se perde ao editar.</span></li>
+        <li><span class="num">2</span><span><b>Validação antes de salvar.</b> Campo obrigatório vazio é sinalizado na própria borda do campo.</span></li>
+        <li><span class="num">3</span><span><b>Peso visual da ação primária.</b> "Salvar" é sempre o botão preenchido, à direita; "Cancelar" fica neutro, à esquerda dele.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">05</span><h2>Estados e comportamento</h2></div>
+    <p class="section-intro">Três estados cobrem o que foge do caminho feliz de uma listagem.</p>
+    <div class="states-grid">
+      <div class="state-card">
+        <h3>Lista vazia</h3>
+        <p>Busca ou filtro sem resultado: a tabela mostra uma única linha de texto — "Nenhum registro encontrado" — no lugar das linhas de dado, sem ilustração.</p>
+      </div>
+      <div class="state-card warn">
+        <h3>Campo obrigatório vazio</h3>
+        <p>Ao tentar salvar, o campo pendente recebe borda na cor de atenção; os demais campos preenchidos não são afetados nem precisam ser repetidos.</p>
+      </div>
+      <div class="state-card danger">
+        <h3>Situação crítica</h3>
+        <p>Esgotado, vencido ou indisponível: o selo usa a cor de maior urgência e o item entra na lista de alertas do Painel até a quantidade ou a situação mudar.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom:20px;">
+    <div class="section-head"><span class="section-num">06</span><h2>Especificações de desktop</h2></div>
+    <ul class="spec-list">
+      <li><span class="k">largura de projeto</span><span>1280px ou mais; abaixo disso, a tabela recebe rolagem horizontal própria em vez de quebrar linha.</span></li>
+      <li><span class="k">navegação lateral</span><span>260px fixos, sempre visível — não colapsa em ícone no desktop.</span></li>
+      <li><span class="k">conteúdo</span><span>respiro lateral de 42px; título do módulo e data no topo, em todas as telas.</span></li>
+      <li><span class="k">linha de tabela</span><span>texto de 14px, altura confortável para leitura rápida de muitos registros em sequência.</span></li>
+      <li><span class="k">formulário modal</span><span>largura máxima de 480px, centralizado, sobre uma camada escurecida que mantém a lista legível ao fundo.</span></li>
+      <li><span class="k">cor de situação</span><span>verde (ok), âmbar (atenção) e vermelho (crítico) — o mesmo par cor/texto em frotas, militares, medicamentos, aprovisionamento e armamento.</span></li>
+    </ul>
+  </section>
+
+  <footer>Documentação de UX do SGO — Sistema de Gestão Operacional. Complementa o protótipo navegável já entregue.</footer>
+
+</div>
+
+<!--claude-mermaid-runtime-begin:3477-->
+<style>.mermaid-diagram{margin-block:4px}.mermaid-diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}</style>
+<script src="/_runtime/mermaid-11.16.1.min.js"></script>
+<script>(function(){
+var CFG={"palettes":{"light":{"surface":"#f4efe4","text":"#42392e","line":"#8a7f6d","border":"#7a6c52","bg":"#fffdf8"},"dark":{"surface":"#262b34","text":"#f2f3f5","line":"#a8adb8","border":"#9aa4b8","bg":"#1f232b"}}};
+if(typeof mermaid==='undefined')return;
+var pres=Array.prototype.slice.call(document.querySelectorAll('pre.mermaid')).filter(function(p){if(p.hasAttribute('data-claude-mermaid-claimed'))return false;p.setAttribute('data-claude-mermaid-claimed','1');return true;});
+if(!pres.length)return;
+var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+var root=document.documentElement;
+var items=pres.map(function(pre){
+var mount=document.createElement('div');mount.className='mermaid-diagram';
+return {pre:pre,mount:mount,src:pre.textContent||''};
+});
+var seq=0;
+var renderGen=0;
+var lastKey='';
+function pageBg(fallback){
+var els=[document.body,document.documentElement];
+for(var i=0;i<els.length;i++){
+var c=els[i]&&getComputedStyle(els[i]).backgroundColor;
+if(c&&c!=='transparent'&&c!=='rgba(0, 0, 0, 0)')return c;
+}
+return fallback;
+}
+function render(){
+var theme=root.getAttribute('data-theme');
+var dark=theme==='dark'||(!!(mq&&mq.matches)&&theme!=='light');
+var pal=dark?CFG.palettes.dark:CFG.palettes.light;
+var bg=pageBg(pal.bg);
+var key=(dark?'d':'l')+'|'+bg;
+if(key===lastKey)return;
+lastKey=key;
+var gen=++renderGen;
+var font=getComputedStyle(document.body).fontFamily||'sans-serif';
+var nat={useMaxWidth:false};
+mermaid.initialize({
+startOnLoad:false,securityLevel:'strict',theme:'base',
+flowchart:nat,sequence:nat,er:nat,state:nat,class:nat,pie:nat,
+gantt:nat,journey:nat,timeline:nat,gitGraph:nat,mindmap:nat,xyChart:nat,
+quadrantChart:nat,sankey:nat,c4:nat,requirement:nat,block:nat,
+packet:nat,kanban:nat,architecture:nat,radar:nat,
+themeVariables:{background:bg,mainBkg:pal.surface,primaryColor:pal.surface,
+primaryTextColor:pal.text,lineColor:pal.line,primaryBorderColor:pal.border,
+nodeBorder:pal.border,clusterBorder:pal.border,edgeLabelBackground:bg,
+clusterBkg:'rgba(127,127,127,0.07)',titleColor:pal.text,
+darkMode:dark,rowOdd:bg,rowEven:'rgba(127,127,127,0.07)',
+attributeBackgroundColorOdd:bg,attributeBackgroundColorEven:'rgba(127,127,127,0.07)',
+fontSize:'16px',fontFamily:font},
+themeCSS:'.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke-width: 2px; }'
+});
+items.forEach(function(it){
+var id='claude-mermaid-'+seq++;
+mermaid.render(id,it.src).then(function(r){
+if(gen!==renderGen)return;
+var prev=it.pre.previousElementSibling;
+if(prev&&prev.className==='mermaid-diagram'&&prev!==it.mount)return;
+it.mount.innerHTML=r.svg;
+if(!it.mount.parentNode)it.pre.parentNode.insertBefore(it.mount,it.pre);
+it.pre.style.display='none';
+},function(){
+var scratch=document.getElementById(id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+scratch=document.getElementById('d'+id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+if(gen!==renderGen)return;
+if(it.mount.parentNode)it.mount.parentNode.removeChild(it.mount);
+it.pre.style.display='';
+});
+});
+}
+render();
+if(mq&&mq.addEventListener)mq.addEventListener('change',render);
+if(typeof MutationObserver!=='undefined')new MutationObserver(render).observe(root,{attributes:true,attributeFilter:['data-theme']});
+})();</script>
+<!--claude-mermaid-runtime-end-->
+
+</body></html>
