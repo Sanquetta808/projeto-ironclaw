@@ -1,6 +1,6 @@
 -- IronClaw - Schema PostgreSQL
 
-CREATE TABLE frotas (
+CREATE TABLE IF NOT EXISTS frotas (
   id SERIAL PRIMARY KEY,
   prefixo VARCHAR(50) NOT NULL,
   tipo VARCHAR(100) NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE frotas (
   status VARCHAR(30) NOT NULL CHECK (status IN ('Operacional','Manutenção','Baixada'))
 );
 
-CREATE TABLE militares (
+CREATE TABLE IF NOT EXISTS militares (
   id SERIAL PRIMARY KEY,
   nome VARCHAR(150) NOT NULL,
   posto VARCHAR(30) NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE militares (
   status VARCHAR(30) NOT NULL CHECK (status IN ('Ativo','Missão','Instrução','Licença'))
 );
 
-CREATE TABLE medicamentos (
+CREATE TABLE IF NOT EXISTS medicamentos (
   id SERIAL PRIMARY KEY,
   nome VARCHAR(150) NOT NULL,
   categoria VARCHAR(100) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE medicamentos (
   validade DATE NOT NULL
 );
 
-CREATE TABLE aprovisionamento (
+CREATE TABLE IF NOT EXISTS aprovisionamento (
   id SERIAL PRIMARY KEY,
   item VARCHAR(150) NOT NULL,
   categoria VARCHAR(100) NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE aprovisionamento (
   secao_destino VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE armamento (
+CREATE TABLE IF NOT EXISTS armamento (
   id SERIAL PRIMARY KEY,
   modelo VARCHAR(150) NOT NULL,
   categoria VARCHAR(100) NOT NULL,
